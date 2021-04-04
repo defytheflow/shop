@@ -6,6 +6,7 @@ from werkzeug.routing import Map, Rule
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Request
 
+import db
 import views
 
 url_map = Map([

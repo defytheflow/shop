@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome</title>
+  </head>
+  <body>
+    <h1><strong>Welcome to our shop!</strong></h1>
+    <ul>
+      <li><a href="/cart">Cart</a></li>
+      <li>
+        <a href="/products/cats">Cats</a>
+      </li>
+    </ul>
+
+    <ul>
+      {% for product in products %}
+      <li>
+        {{ product[1] }} | {{ product[2] }}
+        <p>{{ product[4] }}</p>
+        <img src="{{ product[3] }}" width="25%" height="25%" />
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

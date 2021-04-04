@@ -5,8 +5,12 @@ name = "pypi"
 
 [packages]
 werkzeug = "*"
+jinja2 = "*"
 
 [dev-packages]
+
+[scripts]
+start = "python3 src/main.py"
 
 [requires]
 python_version = "3.8"
