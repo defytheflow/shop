@@ -1,2 +1,4 @@
 shop.db
 __pycache__/
+.env
+media/

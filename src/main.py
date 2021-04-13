@@ -8,11 +8,13 @@ from werkzeug.wrappers import Request
 
 import db
 import views
+from settings import MEDIA_ROOT, STATIC_ROOT
 
 url_map = Map([
     Rule('/', endpoint='index'),
     Rule('/cart/', endpoint='cart'),
-    Rule('/products/<id>/', endpoint='product_detail')
+    Rule('/products/<id>/', endpoint='product_detail'),
+    Rule('/products/create/', endpoint='product_create'),
 ])
 
 
@@ -33,7 +35,7 @@ def application(environ, start_response):
 
 
 application = SharedDataMiddleware(
-    application, {'': os.path.join(os.path.dirname(__file__), 'static')})
+    application, {'': STATIC_ROOT, '/media': MEDIA_ROOT})
 
 if __name__ == '__main__':
     run_simple('127.0.0.1',

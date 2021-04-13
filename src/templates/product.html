@@ -4,9 +4,21 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>{{ product[1] }}</title>
   </head>
   <body>
-    This is a page for product {{ product }}
+    <div>
+      {% if product[3] %}
+      <img src="/media/{{ product[3] }}" width="25%" height="25%" />
+      {% endif %}
+      <p>Name: {{ product[1] }}.</p>
+      <p>Price: {{ product[2] }}.</p>
+      {% if product[4] %}
+      <p>Description: {{ product[4] }}.</p>
+      {% else %}
+      <p>Description: none.</p>
+      {% endif %}
+      <p>Shop: {{ product[-2] }}</p>
+    </div>
   </body>
 </html>

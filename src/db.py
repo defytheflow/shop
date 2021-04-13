@@ -1,55 +1,94 @@
 import os
-import sqlite3
+
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv() 
 
 
 class DB:
 
-    def __init__(self, db_name):
-        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                               db_name)
-        self.connection = sqlite3.connect(db_path, check_same_thread=False)
-        self.cursor = self.connection.cursor()
+    def __init__(self):
+        self.conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
+        self.cursor = self.conn.cursor()
         self._create_tables()
 
     def _create_tables(self):
         self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS products(
-                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR(128) NOT NULL UNIQUE,
-                price DOUBLE PRECISION NOT NULL,
-                image TEXT NOT NULL,
-                description TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS shops(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(64) NOT NULL UNIQUE,
+                image VARCHAR(256) NOT NULL DEFAULT ''
             )
         """)
-        self.connection.commit()
 
-    def create_product(self, name, price, image, description=''):
         self.cursor.execute("""
-            INSERT INTO products (name, price, image, description) VALUES (
-                ?, ?, ?, ?
+            CREATE TABLE IF NOT EXISTS categories(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(64) NOT NULL UNIQUE,
+                image VARCHAR(256) NOT NULL DEFAULT ''
             )
-        """, (name, price, image, description))
-        self.connection.commit()
+        """)
 
-    def get_product(self, pk=None):
-        if pk is None:
-            raise ValueError('pk is required')
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS products(
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(128) NOT NULL UNIQUE,
+                price NUMERIC(10,2) NOT NULL,
+                image VARCHAR(256) NOT NULL DEFAULT '',
+                description TEXT NOT NULL DEFAULT '',
+                shop_id INT REFERENCES shops(id) ON DELETE CASCADE
+            )
+        """)
+        
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS product_category(
+                product_id INT REFERENCES products(id) ON DELETE CASCADE,
+                category_id INT REFERENCES categories(id) ON DELETE CASCADE,
+                CONSTRAINT product_category_pk PRIMARY KEY (product_id, category_id)
+            )
+        """)
 
-        rows = self.cursor.execute("""
-            SELECT id, name, price, image, description FROM products
-            WHERE id = ?
-        """, (pk,)).fetchall()
-        self.connection.commit()
+        self.conn.commit()
 
-        return rows[0]
+    def create_shop(self, name, image=''):
+        self.cursor.execute("""
+            INSERT INTO shops (name, image) VALUES (
+                %s, %s
+            ) RETURNING *
+        """, (name, image))
+        row = self.cursor.fetchone()
+        self.conn.commit()
+        return row
+
+    def create_product(self, name, price, shop_id, image='', description=''):
+        self.cursor.execute("""
+            INSERT INTO products (name, price, shop_id, image, description) VALUES (
+                %s, %s, %s, %s, %s
+            ) RETURNING *
+        """, (name, price, shop_id, image, description))
+        row = self.cursor.fetchone()
+        self.conn.commit()
+        return row
+
+    def get_product(self, pk):
+        self.cursor.execute("""
+            SELECT * FROM products
+            INNER JOIN shops ON shops.id = products.shop_id
+            WHERE products.id = %s
+        """, (pk,))
+        row = self.cursor.fetchone()
+        self.conn.commit()
+        return row
 
     def get_products(self):
-        rows = self.cursor.execute("""
-            SELECT id, name, price, image, description FROM products
-        """).fetchall()
-        self.connection.commit()
-
+        self.cursor.execute("""
+            SELECT *
+            FROM products INNER JOIN shops ON shops.id = products.shop_id
+        """)
+        rows = self.cursor.fetchall()
+        self.conn.commit()
         return rows
 
 
-db = DB("shop.db")
+db = DB()

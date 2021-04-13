@@ -7,22 +7,65 @@
     <title>Welcome</title>
   </head>
   <body>
-    <h1><strong>Welcome to our shop!</strong></h1>
-    <ul>
-      <li><a href="/cart">Cart</a></li>
-      <li>
-        <a href="/products/cats">Cats</a>
-      </li>
-    </ul>
+    <h1>Welcome to our shop!</h1>
 
-    <ul>
-      {% for product in products %}
-      <li>
-        {{ product[1] }} | {{ product[2] }}
-        <p>{{ product[4] }}</p>
-        <img src="{{ product[3] }}" width="25%" height="25%" />
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="products-container">
+      <ul>
+        {% for product in products %}
+        <li>
+          <a href="/products/{{ product[0] }}">{{ product[1] }}</a> -- ({{
+          product[2] }})
+          <p>{{ product[4] }}</p>
+          {% if product[3] %}
+          <img src="/media/{{ product[3] }}" width="25%" height="25%" />
+          {% endif %}
+          <hr />
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="product-create-container">
+      <form
+        action="/products/create"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <fieldset>
+          <legend>Product</legend>
+          <div>
+            <label for="name">Name:</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              maxlength="128"
+              required
+              autocomplete="off"
+            />
+          </div>
+          <div>
+            <label for="price">Price:</label>
+            <input id="price" name="price" type="number" step="any" required />
+          </div>
+          <div>
+            <label for="description">Description:</label>
+            <textarea
+              id="description"
+              name="description"
+              cols="30"
+              rows="10"
+            ></textarea>
+          </div>
+          <div>
+            <label for="image">Image:</label>
+            <input id="image" name="image" type="file" />
+          </div>
+          <div>
+            <button>Create</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
   </body>
 </html>
