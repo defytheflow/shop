@@ -18,6 +18,7 @@ class DB:
             CREATE TABLE IF NOT EXISTS shops(
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(64) NOT NULL UNIQUE,
+                slug VARCHAR(64) NOT NULL UNIQUE,
                 image VARCHAR(256) NOT NULL DEFAULT ''
             )
         """)
@@ -50,45 +51,5 @@ class DB:
         """)
 
         self.conn.commit()
-
-    def create_shop(self, name, image=''):
-        self.cursor.execute("""
-            INSERT INTO shops (name, image) VALUES (
-                %s, %s
-            ) RETURNING *
-        """, (name, image))
-        row = self.cursor.fetchone()
-        self.conn.commit()
-        return row
-
-    def create_product(self, name, price, shop_id, image='', description=''):
-        self.cursor.execute("""
-            INSERT INTO products (name, price, shop_id, image, description) VALUES (
-                %s, %s, %s, %s, %s
-            ) RETURNING *
-        """, (name, price, shop_id, image, description))
-        row = self.cursor.fetchone()
-        self.conn.commit()
-        return row
-
-    def get_product(self, pk):
-        self.cursor.execute("""
-            SELECT * FROM products
-            INNER JOIN shops ON shops.id = products.shop_id
-            WHERE products.id = %s
-        """, (pk,))
-        row = self.cursor.fetchone()
-        self.conn.commit()
-        return row
-
-    def get_products(self):
-        self.cursor.execute("""
-            SELECT *
-            FROM products INNER JOIN shops ON shops.id = products.shop_id
-        """)
-        rows = self.cursor.fetchall()
-        self.conn.commit()
-        return rows
-
 
 db = DB()

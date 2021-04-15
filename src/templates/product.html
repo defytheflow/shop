@@ -4,21 +4,20 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ product[1] }}</title>
-  </head>
+    <title>• {{ product.name }} •</title>
   <body>
     <div>
-      {% if product[3] %}
-      <img src="/media/{{ product[3] }}" width="25%" height="25%" />
+      {% if product.image %}
+      <img src="/media/{{ product.image }}" width="25%" height="25%" />
       {% endif %}
-      <p>Name: {{ product[1] }}.</p>
-      <p>Price: {{ product[2] }}.</p>
-      {% if product[4] %}
-      <p>Description: {{ product[4] }}.</p>
+      <p>Name: {{ product.name }}.</p>
+      <p>Price: {{ product.price }}.</p>
+      {% if product.description %}
+      <p>Description: {{ product.description }}.</p>
       {% else %}
       <p>Description: none.</p>
       {% endif %}
-      <p>Shop: {{ product[-2] }}</p>
+      <p>Shop: {{ product.shop.name }}</p>
     </div>
   </body>
 </html>

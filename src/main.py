@@ -1,5 +1,3 @@
-import os
-
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from werkzeug.routing import Map, Rule
@@ -15,6 +13,7 @@ url_map = Map([
     Rule('/cart/', endpoint='cart'),
     Rule('/products/<id>/', endpoint='product_detail'),
     Rule('/products/create/', endpoint='product_create'),
+    Rule('/shops/<slug>/', endpoint='shop_detail')
 ])
 
 

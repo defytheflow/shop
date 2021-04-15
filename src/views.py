@@ -3,7 +3,7 @@ import os
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import redirect, secure_filename
 
-from db import db
+from models import Product, Shop
 from settings import MEDIA_ROOT
 from utils import render_template
 
@@ -18,22 +18,29 @@ def allowed_image(image_name):
 
 
 def index(request, values):
-    products = db.get_products()
-    print(products)
-    return render_template('index.html', {'products': products})
+    shops = Shop.all()
+    return render_template('index.html', {'shops': shops})
 
 
 def cart(request, values):
     return render_template('cart.html')
 
 
+def shop_detail(request, values):
+    shop = Shop.get(slug=values.get('slug'))
+
+    if shop is None:
+        return NotFound()
+
+    return render_template('shop.html', {'shop': shop})
+
+
 def product_detail(request, values):
-    product = db.get_product(pk=values.get('id'))
+    product = Product.get(pk=values.get('id'))
 
     if product is None:
         return NotFound()
 
-    print(product)
     return render_template('product.html', {'product': product})
 
 
@@ -49,6 +56,12 @@ def product_create(request, values):
     else:
         image_name = ''
 
-    db.create_product(name=name, price=price, image=image_name,
-                      description=description)
+    product = Product.create(
+        name=name,
+        price=price,
+        image=image_name,
+        shop_id=1,
+        description=description)
+
+    print(product)
     return redirect('/')
