@@ -5,13 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>• {{ product.name }} •</title>
+    <link rel="stylesheet" href="/main.css" />
   <body>
     <div>
       {% if product.image %}
       <img src="/media/{{ product.image }}" width="25%" height="25%" />
       {% endif %}
       <p>Name: {{ product.name }}.</p>
-      <p>Price: {{ product.price }}.</p>
+      <p>Price: {{ product.price }}$.</p>
       {% if product.description %}
       <p>Description: {{ product.description }}.</p>
       {% else %}

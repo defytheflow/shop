@@ -5,11 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome</title>
+    <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
     <h1>Welcome to {{ shop.name }}!</h1>
 
     <div class="products-container">
+      <h2>Products</h2>
       <ul>
         {% for product in shop.products %}
         <li>
@@ -47,6 +49,7 @@
           <div>
             <label for="price">Price:</label>
             <input id="price" name="price" type="number" step="any" required />
+            <span>$</span>
           </div>
           <div>
             <label for="description">Description:</label>
@@ -62,10 +65,53 @@
             <input id="image" name="image" type="file" />
           </div>
           <div>
+            <input name="shop_id" type="hidden" value="{{ shop.id }}" />
+          </div>
+          <div>
             <button>Create</button>
           </div>
         </fieldset>
       </form>
     </div>
+
+    <div>
+      <h2>Reviews</h2>
+      <ul>
+        {% for review in shop.reviews %}
+        <li>
+          <p>{{ review.username }}</p>
+          <p>{{ review.text }}</p>
+          <hr />
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <form action="/shops/reviews/create/" method="POST">
+      <fieldset>
+        <legend>Review</legend>
+        <div>
+          <label for="username">Username:</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            maxlength="64"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div>
+          <label for="text">Text:</label>
+          <textarea id="text" name="text" cols="30" rows="10"></textarea>
+        </div>
+        <div>
+          <input name="shop_id" type="hidden" value="{{ shop.id }}" />
+        </div>
+        <div>
+          <button>Post</button>
+        </div>
+      </fieldset>
+    </form>
   </body>
 </html>

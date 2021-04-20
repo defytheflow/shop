@@ -13,6 +13,7 @@ psycopg2-binary = "*"
 
 [scripts]
 start = "python3 src/main.py"
+dbshell = "psql $DATABASE_URL"
 
 [requires]
 python_version = "3.8"

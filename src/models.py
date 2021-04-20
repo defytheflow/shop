@@ -19,7 +19,7 @@ class Shop:
         """, (name, slug, image))
         row = db.cursor.fetchone()
         db.conn.commit()
-        return Shop(*row)
+        return cls(*row)
 
     @classmethod
     def get(cls, pk=None, slug=None):
@@ -37,7 +37,7 @@ class Shop:
         row = db.cursor.fetchone()
         db.conn.commit()
 
-        return None if row is None else Shop(*row)
+        return None if row is None else cls(*row)
 
     @classmethod
     def all(cls):
@@ -46,7 +46,7 @@ class Shop:
         """)
         rows = db.cursor.fetchall()
         db.conn.commit()
-        shops = [Shop(*row) for row in rows]
+        shops = [cls(*row) for row in rows]
         return shops
 
     @property
@@ -58,11 +58,43 @@ class Shop:
         """, (self.id, ))
         rows = db.cursor.fetchall()
         db.conn.commit()
-        products = [Product(*row[:5], Shop(*row[6:])) for row in rows]
+        products = [Product(*row[:5], self.__class__(*row[6:])) for row
+                    in rows]
         return products
+
+    @property
+    def reviews(self):
+        db.cursor.execute("""
+            SELECT * FROM shop_reviews
+            WHERE shop_id = %s
+        """, (self.id, ))
+        rows = db.cursor.fetchall()
+        db.conn.commit()
+        reviews = [ShopReview(*row[:-1], self) for row in rows]
+        return reviews
 
     def get_absolute_url(self):
         return f'/shops/{self.slug}'
+
+
+@dataclass
+class ShopReview:
+    id: int
+    username: str
+    text: str
+    shop: Shop
+
+    @classmethod
+    def create(cls, username, text, shop_id):
+        db.cursor.execute("""
+            INSERT INTO shop_reviews (
+                username, text, shop_id) VALUES (
+                %s, %s, %s
+            ) RETURNING *
+        """, (username, text, shop_id))
+        row = db.cursor.fetchone()
+        db.conn.commit()
+        return cls(*row)
 
 
 @dataclass
@@ -91,7 +123,7 @@ class Product:
         """, (name, price, shop_id, image, description))
         row = db.cursor.fetchone()
         db.conn.commit()
-        return Product(*row)
+        return cls(*row)
 
     @classmethod
     def get(cls, pk):
@@ -102,7 +134,7 @@ class Product:
         """, (pk,))
         row = db.cursor.fetchone()
         db.conn.commit()
-        return None if row is None else Product(*row[:5], Shop(*row[6:]))
+        return None if row is None else cls(*row[:5], Shop(*row[6:]))
 
     @classmethod
     def all(cls):
@@ -112,7 +144,7 @@ class Product:
         """)
         rows = db.cursor.fetchall()
         db.conn.commit()
-        products = [Product(*row[:5], Shop(*row[6:])) for row in rows]
+        products = [cls(*row[:5], Shop(*row[6:])) for row in rows]
         return products
 
     def get_absolute_url(self):

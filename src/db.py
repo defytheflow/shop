@@ -34,11 +34,12 @@ class DB:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS products(
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(128) NOT NULL UNIQUE,
+                name VARCHAR(128) NOT NULL,
                 price NUMERIC(10,2) NOT NULL,
                 image VARCHAR(256) NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
-                shop_id INT REFERENCES shops(id) ON DELETE CASCADE
+                shop_id INT REFERENCES shops(id) ON DELETE CASCADE,
+                CONSTRAINT unique_product_per_shop UNIQUE (name, shop_id)
             )
         """)
         
@@ -47,6 +48,15 @@ class DB:
                 product_id INT REFERENCES products(id) ON DELETE CASCADE,
                 category_id INT REFERENCES categories(id) ON DELETE CASCADE,
                 CONSTRAINT product_category_pk PRIMARY KEY (product_id, category_id)
+            )
+        """)
+
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS shop_reviews(
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(64) NOT NULL,
+                text TEXT NOT NULL,
+                shop_id INT REFERENCES shops(id) ON DELETE CASCADE
             )
         """)
 
