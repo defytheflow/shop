@@ -10,6 +10,29 @@ class Shop:
     slug: str
     image: str
 
+    # WHERE product_category.product_id
+
+    # SELECT DISTINCT category_id FROM product_category
+    # INNER JOIN products ON products.id = product_category.product_id
+
+    def get_categories(self):
+        db.cursor.execute("""
+            SELECT DISTINCT categories.id, categories.name, categories.image
+            FROM categories
+            
+            INNER JOIN product_category
+            ON product_category.category_id = categories.id
+            
+            INNER JOIN products
+            ON products.id = product_category.product_id
+            
+            WHERE products.shop_id = %s;
+        """, (self.id, ))
+        rows = db.cursor.fetchall()
+        db.conn.commit()
+        categories = [Category(*row) for row in rows]
+        return categories
+
     @classmethod
     def create(cls, name, slug, image=''):
         db.cursor.execute("""
@@ -103,6 +126,28 @@ class Category:
     name: str
     image: str
 
+    @classmethod
+    def create(cls, name, image=''):
+        db.cursor.execute("""
+            INSERT INTO categories (
+                name, image) VALUES (
+                %s, %s
+            ) RETURNING *
+        """, (name, image))
+        row = db.cursor.fetchone()
+        db.conn.commit()
+        return cls(*row)
+
+    @classmethod
+    def all(cls):
+        db.cursor.execute("""
+            SELECT * FROM categories
+        """)
+        rows = db.cursor.fetchall()
+        db.conn.commit()
+        categories = [cls(*row) for row in rows]
+        return categories
+
 
 @dataclass
 class Product:
@@ -112,6 +157,24 @@ class Product:
     image: str
     description: str
     shop: Shop
+
+    def get_categories(self):
+        db.cursor.execute("""
+            SELECT categories.id, categories.name, categories.image from product_category
+            INNER JOIN categories ON categories.id = product_category.category_id
+            WHERE product_id = %s
+        """, (self.id, ))
+        rows = db.cursor.fetchall()
+        db.conn.commit()
+        categories = [Category(*row) for row in rows]
+        return categories
+
+    def add_category(self, category_id):
+        db.cursor.execute("""
+            INSERT INTO product_category (
+                product_id, category_id
+            ) VALUES (%s, %s)
+        """, (self.id, category_id))
 
     @classmethod
     def create(cls, name, price, shop_id, image='', description=''):

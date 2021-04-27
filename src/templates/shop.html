@@ -10,6 +10,17 @@
   <body>
     <h1>Welcome to {{ shop.name }}!</h1>
 
+    <h3>Categories:</h3>
+    {% with categories = shop.get_categories() %} {% if categories %}
+    <ul>
+      {% for category in shop.get_categories() %}
+      <li>{{ category.name }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>None</p>
+    {% endif %} {% endwith %}
+
     <div class="products-container">
       <h2>Products</h2>
       <ul>
@@ -45,6 +56,13 @@
               required
               autocomplete="off"
             />
+          </div>
+          <div>
+            <select name="category" id="category" multiple="multiple">
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div>
             <label for="price">Price:</label>

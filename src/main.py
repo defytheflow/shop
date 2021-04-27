@@ -15,7 +15,8 @@ url_map = Map([
     Rule('/products/create/', endpoint='product_create'),
     Rule('/shops/<slug>/', endpoint='shop_detail'),
     Rule('/shops/create/', endpoint='shop_create'),
-    Rule('/shops/reviews/create/', endpoint='shop_review_create')
+    Rule('/shops/reviews/create/', endpoint='shop_review_create'),
+    # Rule('/shops/categories/', endpoint='shop_category_create')
 ])
 
 

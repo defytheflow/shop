@@ -3,7 +3,7 @@ import os
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import redirect, secure_filename
 
-from models import Product, Shop, ShopReview
+from models import Category, Product, Shop, ShopReview
 from settings import MEDIA_ROOT
 from utils import render_template
 
@@ -32,7 +32,10 @@ def shop_detail(request, values):
     if shop is None:
         return NotFound()
 
-    return render_template('shop.html', {'shop': shop})
+    categories = Category.all()
+
+    return render_template('shop.html', {'shop': shop,
+                                         'categories': categories})
 
 
 def product_detail(request, values):
@@ -48,6 +51,7 @@ def product_create(request, values):
     name = request.form.get('name')
     price = request.form.get('price')
     description = request.form.get('description')
+    categories = request.form.getlist('category')
     image = request.files.get('image')
     shop_id = request.form.get('shop_id')
 
@@ -57,12 +61,15 @@ def product_create(request, values):
     else:
         image_name = ''
 
-    Product.create(
+    product = Product.create(
         name=name,
         price=price,
         image=image_name,
         shop_id=shop_id,
         description=description)
+
+    for category in categories:
+        product.add_category(category)
 
     shop = Shop.get(shop_id)
     return redirect(shop.get_absolute_url())
@@ -99,3 +106,20 @@ def shop_review_create(request, values):
 
     shop = Shop.get(shop_id)
     return redirect(shop.get_absolute_url())
+
+
+# def shop_category_create(request, values):
+#     name = request.form.get('name')
+#     image = request.files.get('image')
+
+#     if image and allowed_image(image.filename):
+#         image_name = secure_filename(image.filename)
+#         image.save(os.path.join(MEDIA_ROOT, image_name))
+#     else:
+#         image_name = ''
+
+#     Category.create(
+#         name=name,
+#         image=image)
+
+#     return redirect('/')

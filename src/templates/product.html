@@ -19,6 +19,18 @@
       <p>Description: none.</p>
       {% endif %}
       <p>Shop: {{ product.shop.name }}</p>
+      <h3>Categories:</h3>
+      {% with categories = product.get_categories() %}
+        {% if categories %}
+          <ul>
+            {% for category in product.get_categories() %}
+              <li>{{ category.name }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>None</p>
+        {% endif %}
+    {% endwith %}
     </div>
   </body>
 </html>
