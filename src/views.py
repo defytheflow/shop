@@ -38,6 +38,25 @@ def shop_detail(request, values):
                                          'categories': categories})
 
 
+def shop_category(request, values):
+    shop = Shop.get(slug=values.get('slug'))
+
+    if shop is None:
+        return NotFound()
+
+    category = Category.get(name=values.get('category'))
+
+    if category is None:
+        return NotFound()
+
+    products = Product.get_by_shop_category(shop.id, category.id)
+
+    return render_template('category.html', {
+        'category': category,
+        'shop': shop,
+        'products': products})
+
+
 def product_detail(request, values):
     product = Product.get(pk=values.get('id'))
 

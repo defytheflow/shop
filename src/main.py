@@ -10,13 +10,13 @@ from settings import MEDIA_ROOT, STATIC_ROOT
 
 url_map = Map([
     Rule('/', endpoint='index'),
-    Rule('/cart/', endpoint='cart'),
-    Rule('/products/<id>/', endpoint='product_detail'),
-    Rule('/products/create/', endpoint='product_create'),
-    Rule('/shops/<slug>/', endpoint='shop_detail'),
-    Rule('/shops/create/', endpoint='shop_create'),
-    Rule('/shops/reviews/create/', endpoint='shop_review_create'),
-    # Rule('/shops/categories/', endpoint='shop_category_create')
+    Rule('/cart', endpoint='cart'),
+    Rule('/products/<id>', endpoint='product_detail'),
+    Rule('/products/create', endpoint='product_create'),
+    Rule('/shops/<slug>', endpoint='shop_detail'),
+    Rule('/shops/create', endpoint='shop_create'),
+    Rule('/shops/reviews/create', endpoint='shop_review_create'),
+    Rule('/shops/<slug>/<category>', endpoint='shop_category')
 ])
 
 
@@ -41,7 +41,7 @@ application = SharedDataMiddleware(
 
 if __name__ == '__main__':
     run_simple('127.0.0.1',
-               5000,
+               8000,
                application,
                use_debugger=True,
                use_reloader=True)

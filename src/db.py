@@ -3,7 +3,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 
 
 class DB:
@@ -42,7 +42,7 @@ class DB:
                 CONSTRAINT unique_product_per_shop UNIQUE (name, shop_id)
             )
         """)
-        
+
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS product_category(
                 product_id INT REFERENCES products(id) ON DELETE CASCADE,
@@ -62,5 +62,6 @@ class DB:
         """)
 
         self.conn.commit()
+
 
 db = DB()

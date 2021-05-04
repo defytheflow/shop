@@ -10,6 +10,7 @@ python-dotenv = "*"
 psycopg2-binary = "*"
 
 [dev-packages]
+yapf = "*"
 
 [scripts]
 start = "python3 src/main.py"

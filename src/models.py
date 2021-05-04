@@ -10,22 +10,19 @@ class Shop:
     slug: str
     image: str
 
-    # WHERE product_category.product_id
-
-    # SELECT DISTINCT category_id FROM product_category
-    # INNER JOIN products ON products.id = product_category.product_id
+    __table__ = 'shops'
 
     def get_categories(self):
         db.cursor.execute("""
             SELECT DISTINCT categories.id, categories.name, categories.image
             FROM categories
-            
+
             INNER JOIN product_category
             ON product_category.category_id = categories.id
-            
+
             INNER JOIN products
             ON products.id = product_category.product_id
-            
+
             WHERE products.shop_id = %s;
         """, (self.id, ))
         rows = db.cursor.fetchall()
@@ -35,8 +32,8 @@ class Shop:
 
     @classmethod
     def create(cls, name, slug, image=''):
-        db.cursor.execute("""
-            INSERT INTO shops (name, slug, image) VALUES (
+        db.cursor.execute(f"""
+            INSERT INTO {cls.__table__} (name, slug, image) VALUES (
                 %s, %s, %s
             ) RETURNING *
         """, (name, slug, image))
@@ -47,15 +44,15 @@ class Shop:
     @classmethod
     def get(cls, pk=None, slug=None):
         if pk is not None:
-            db.cursor.execute("""
-                SELECT * FROM shops WHERE shops.id = %s
+            db.cursor.execute(f"""
+                SELECT * FROM {cls.__table__} WHERE {cls.__table__}.id = %s
             """, (pk,))
         elif slug is not None:
-            db.cursor.execute("""
-                SELECT * FROM shops WHERE shops.slug = %s
+            db.cursor.execute(f"""
+                SELECT * FROM {cls.__table__} WHERE {cls.__table__}.slug = %s
             """, (slug,))
         else:
-            raise ValueError('Either pk or slug is required.')
+            raise ValueError(f'{cls.__name__}: Either pk or slug is required.')
 
         row = db.cursor.fetchone()
         db.conn.commit()
@@ -64,8 +61,8 @@ class Shop:
 
     @classmethod
     def all(cls):
-        db.cursor.execute("""
-            SELECT * FROM shops
+        db.cursor.execute(f"""
+            SELECT * FROM {cls.__table__}
         """)
         rows = db.cursor.fetchall()
         db.conn.commit()
@@ -126,10 +123,12 @@ class Category:
     name: str
     image: str
 
+    __table__ = 'categories'
+
     @classmethod
     def create(cls, name, image=''):
-        db.cursor.execute("""
-            INSERT INTO categories (
+        db.cursor.execute(f"""
+            INSERT INTO {cls.__table__} (
                 name, image) VALUES (
                 %s, %s
             ) RETURNING *
@@ -140,13 +139,31 @@ class Category:
 
     @classmethod
     def all(cls):
-        db.cursor.execute("""
-            SELECT * FROM categories
+        db.cursor.execute(f"""
+            SELECT * FROM {cls.__table__}
         """)
         rows = db.cursor.fetchall()
         db.conn.commit()
         categories = [cls(*row) for row in rows]
         return categories
+
+    @classmethod
+    def get(cls, pk=None, name=None):
+        if pk is not None:
+            db.cursor.execute(f"""
+                SELECT * FROM {cls.__table__} WHERE {cls.__table__}.id = %s
+            """, (pk,))
+        elif name is not None:
+            db.cursor.execute(f"""
+                SELECT * FROM {cls.__table__} WHERE {cls.__table__}.name = %s
+            """, (name,))
+        else:
+            raise ValueError(f'{cls.__name__}: Either pk or name is required.')
+
+        row = db.cursor.fetchone()
+        db.conn.commit()
+
+        return None if row is None else cls(*row)
 
 
 @dataclass
@@ -155,13 +172,17 @@ class Product:
     name: str
     price: float
     image: str
-    description: str
-    shop: Shop
+    description: str = ''
+    shop: Shop = None
+
+    __table__ = 'products'
 
     def get_categories(self):
         db.cursor.execute("""
-            SELECT categories.id, categories.name, categories.image from product_category
-            INNER JOIN categories ON categories.id = product_category.category_id
+            SELECT categories.id, categories.name, categories.image
+            FROM product_category
+            INNER JOIN categories ON
+            categories.id = product_category.category_id
             WHERE product_id = %s
         """, (self.id, ))
         rows = db.cursor.fetchall()
@@ -176,10 +197,25 @@ class Product:
             ) VALUES (%s, %s)
         """, (self.id, category_id))
 
+    # amazon , fruits
+
+    @classmethod
+    def get_by_shop_category(cls, shop_id, category_id):
+        db.cursor.execute(f"""
+            SELECT *
+            FROM {cls.__table__}
+            INNER JOIN product_category ON product_category.category_id = %s
+            WHERE product_category.product_id = {cls.__table__}.id
+            AND {cls.__table__}.shop_id = %s
+        """, (category_id, shop_id))
+        rows = db.cursor.fetchall()
+        db.conn.commit()
+        return [cls(*row[:6]) for row in rows]
+
     @classmethod
     def create(cls, name, price, shop_id, image='', description=''):
-        db.cursor.execute("""
-            INSERT INTO products (
+        db.cursor.execute(f"""
+            INSERT INTO {cls.__table__} (
                 name, price, shop_id, image, description) VALUES (
                 %s, %s, %s, %s, %s
             ) RETURNING *
@@ -190,10 +226,10 @@ class Product:
 
     @classmethod
     def get(cls, pk):
-        db.cursor.execute("""
-            SELECT * FROM products
-            INNER JOIN shops ON shops.id = products.shop_id
-            WHERE products.id = %s
+        db.cursor.execute(f"""
+            SELECT * FROM {cls.__table__}
+            INNER JOIN shops ON shops.id = {cls.__table__}.shop_id
+            WHERE {cls.__table__}.id = %s
         """, (pk,))
         row = db.cursor.fetchone()
         db.conn.commit()
@@ -201,9 +237,9 @@ class Product:
 
     @classmethod
     def all(cls):
-        db.cursor.execute("""
-            SELECT * FROM products
-            INNER JOIN shops ON shops.id = products.shop_id
+        db.cursor.execute(f"""
+            SELECT * FROM {cls.__table__}
+            INNER JOIN shops ON shops.id = {cls.__table__}.shop_id
         """)
         rows = db.cursor.fetchall()
         db.conn.commit()
