@@ -1,62 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome</title>
-    <link rel="stylesheet" href="/main.css" />
-  </head>
-  <body>
-    <h1>Welcome to our shop!</h1>
+{% extends 'base.html' %}
 
-    <div class="shops-container">
-      <ul>
-        {% for shop in shops %}
-        <li>
-          <a href="{{ shop.get_absolute_url() }}">{{ shop.name }}</a>
-          {% if shop.image %}
-          <img src="/media/{{ shop.image }}" width="25%" height="25%" />
-          {% endif %}
-          <hr />
-        </li>
-        {% endfor %}
-      </ul>
+<!-- prettier-ignore-->
+{% block title %} Welcome {% endblock %}
+
+{% block content %}
+<h1>Welcome to our shop!</h1>
+
+<div class="shops-container">
+  <ul>
+    {% for shop in shops %}
+    <li>
+      <a href="{{ shop.get_absolute_url() }}">{{ shop.name }}</a>
+      {% if shop.image %}
+      <img src="/media/{{ shop.image }}" width="25%" height="25%" />
+      {% endif %}
+      <hr />
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<form action="/shops/create" method="POST" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Shop</legend>
+    <div>
+      <label for="name">Name:</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        maxlength="128"
+        required
+        autocomplete="off"
+      />
     </div>
-
-    <form action="/shops/create" method="POST" enctype="multipart/form-data">
-      <fieldset>
-        <legend>Shop</legend>
-        <div>
-          <label for="name">Name:</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            maxlength="128"
-            required
-            autocomplete="off"
-          />
-        </div>
-        <div>
-          <label for="slug">Slug:</label>
-          <input
-            id="slug"
-            name="slug"
-            type="text"
-            maxlength="128"
-            required
-            autocomplete="off"
-          />
-        </div>
-        <div>
-          <label for="image">Image:</label>
-          <input id="image" name="image" type="file" />
-        </div>
-        <div>
-          <button>Create</button>
-        </div>
-      </fieldset>
-    </form>
-  </body>
-</html>
+    <div>
+      <label for="slug">Slug:</label>
+      <input
+        id="slug"
+        name="slug"
+        type="text"
+        maxlength="128"
+        required
+        autocomplete="off"
+      />
+    </div>
+    <div>
+      <label for="image">Image:</label>
+      <input id="image" name="image" type="file" />
+    </div>
+    <div>
+      <button>Create</button>
+    </div>
+  </fieldset>
+</form>
+{% endblock %}

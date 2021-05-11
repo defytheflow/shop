@@ -67,12 +67,20 @@ def product_detail(request, values):
 
 
 def product_create(request, values):
+    shop = Shop.get(slug=values.get('slug'))
+
+    if shop is None:
+        return NotFound()
+
+    if request.method == 'GET':
+        categories = Category.all()
+        return render_template('product-form.html', {'categories': categories, 'shop' : shop})
+
     name = request.form.get('name')
     price = request.form.get('price')
     description = request.form.get('description')
     categories = request.form.getlist('category')
     image = request.files.get('image')
-    shop_id = request.form.get('shop_id')
 
     if image and allowed_image(image.filename):
         image_name = secure_filename(image.filename)
@@ -84,14 +92,77 @@ def product_create(request, values):
         name=name,
         price=price,
         image=image_name,
-        shop_id=shop_id,
+        shop_id=shop.id,
         description=description)
 
     for category in categories:
         product.add_category(category)
 
-    shop = Shop.get(shop_id)
-    return redirect(shop.get_absolute_url())
+    return redirect(f'/shops/{shop.slug}/products/{product.id}')
+
+
+
+def product_update(request, values):
+    shop = Shop.get(slug=values.get('slug'))
+    product = Product.get(pk=values.get('id'))
+    product_categories = [category.id for category in product.get_categories()]
+
+    if shop is None or product is None:
+        return NotFound()
+
+    if request.method == 'GET':
+        categories = Category.all()
+        return render_template('product-form.html', {
+            'categories': categories,
+            'shop': shop,
+            'product': product,
+            'product_categories': product_categories,
+        })
+
+    name = request.form.get('name')
+    price = request.form.get('price')
+    description = request.form.get('description')
+    categories = request.form.getlist('category')
+    image = request.files.get('image')
+
+    if image and image.filename != product.image:
+        if allowed_image(image.filename):
+            image_name = secure_filename(image.filename)
+            image.save(os.path.join(MEDIA_ROOT, image_name))
+            if product.image != '':
+                os.remove(os.path.join(MEDIA_ROOT, product.image))
+        else:
+            image_name = ''
+    else:
+        image_name = ''
+
+    product.update(
+        name=name or product.name,
+        price=price or product.price,
+        description=description or product.description,
+        image=image_name or product.image,
+    )
+
+    # TODO: update categories
+
+    return redirect(f'/shops/{shop.slug}/products/{product.id}')
+
+    # for category in categories:
+    #     if category not in product_categories:
+    #         product.add_category(category)
+
+
+    # product = Product.create(
+    #     name=name,
+    #     price=price,
+    #     image=image_name,
+    #     shop_id=shop.id,
+    #     description=description)
+
+    # for category in categories:
+    #     product.add_category(category)
+
+
 
 
 def shop_create(request, values):
@@ -114,16 +185,19 @@ def shop_create(request, values):
 
 
 def shop_review_create(request, values):
+    shop = Shop.get(slug=values.get('slug'))
+
+    if shop is None:
+        return NotFound()
+
     username = request.form.get('username')
     text = request.form.get('text')
-    shop_id = request.form.get('shop_id')
 
     ShopReview.create(
         username=username,
         text=text,
-        shop_id=shop_id)
+        shop_id=shop.id)
 
-    shop = Shop.get(shop_id)
     return redirect(shop.get_absolute_url())
 
 

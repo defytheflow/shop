@@ -1,122 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ shop.name }}</title>
-    <link rel="stylesheet" href="/main.css" />
-  </head>
-  <body>
-    <h1>Welcome to {{ shop.name }}!</h1>
+{% extends 'base.html' %}
 
-    <h3>Categories:</h3>
-    {% with categories = shop.get_categories() %} {% if categories %}
-    <ul>
-      {% for category in shop.get_categories() %}
-      <li>
-        <a href="/shops/{{ shop.slug }}/{{ category.name }}"
-          >{{ category.name }}</a
-        >
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>None</p>
-    {% endif %} {% endwith %}
+<!-- prettier-ignore -->
+{% block title %} {{ shop.name }} {% endblock %}
 
-    <div class="product-create-container">
-      <form
-        action="/products/create"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        <fieldset>
-          <legend>Product</legend>
-          <div>
-            <label for="name">Name:</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              maxlength="128"
-              required
-              autocomplete="off"
-            />
-          </div>
-          <div>
-            <select name="category" id="category" multiple="multiple">
-              {% for category in categories %}
-              <option value="{{ category.id }}">{{ category.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="price">Price:</label>
-            <input id="price" name="price" type="number" step="any" required />
-            <span>$</span>
-          </div>
-          <div>
-            <label for="description">Description:</label>
-            <textarea
-              id="description"
-              name="description"
-              cols="30"
-              rows="10"
-            ></textarea>
-          </div>
-          <div>
-            <label for="image">Image:</label>
-            <input id="image" name="image" type="file" />
-          </div>
-          <div>
-            <input name="shop_id" type="hidden" value="{{ shop.id }}" />
-          </div>
-          <div>
-            <button>Create</button>
-          </div>
-        </fieldset>
-      </form>
-    </div>
+{% block content %}
+<h1>Welcome to {{ shop.name }}!</h1>
 
+<h3>Categories:</h3>
+{% with categories = shop.get_categories() %} {% if categories %}
+<ul>
+  {% for category in shop.get_categories() %}
+  <li>
+    <a href="/shops/{{ shop.slug }}/{{ category.name }}">{{ category.name }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>None</p>
+{% endif %} {% endwith %}
+
+<div>
+  <button>
+    <a href="/shops/{{ shop.slug }}/products/create">Create a product</a>
+  </button>
+</div>
+
+<div>
+  <h2>Reviews</h2>
+  <ul>
+    {% for review in shop.reviews %}
+    <li>
+      <p>{{ review.username }}</p>
+      <p>{{ review.text }}</p>
+      <hr />
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<form action="/shops/{{ shop.slug }}/reviews/create" method="POST">
+  <fieldset>
+    <legend>Review</legend>
     <div>
-      <h2>Reviews</h2>
-      <ul>
-        {% for review in shop.reviews %}
-        <li>
-          <p>{{ review.username }}</p>
-          <p>{{ review.text }}</p>
-          <hr />
-        </li>
-        {% endfor %}
-      </ul>
+      <label for="username">Username:</label>
+      <input
+        id="username"
+        name="username"
+        type="text"
+        maxlength="64"
+        required
+        autocomplete="off"
+      />
     </div>
-
-    <form action="/shops/reviews/create/" method="POST">
-      <fieldset>
-        <legend>Review</legend>
-        <div>
-          <label for="username">Username:</label>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            maxlength="64"
-            required
-            autocomplete="off"
-          />
-        </div>
-        <div>
-          <label for="text">Text:</label>
-          <textarea id="text" name="text" cols="30" rows="10"></textarea>
-        </div>
-        <div>
-          <input name="shop_id" type="hidden" value="{{ shop.id }}" />
-        </div>
-        <div>
-          <button>Post</button>
-        </div>
-      </fieldset>
-    </form>
-  </body>
-</html>
+    <div>
+      <label for="text">Text:</label>
+      <textarea id="text" name="text" cols="30" rows="10"></textarea>
+    </div>
+    <div>
+      <button>Post</button>
+    </div>
+  </fieldset>
+</form>
+{% endblock %}

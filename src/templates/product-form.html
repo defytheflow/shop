@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+<!-- prettier-ignore -->
+{% block title %} Create new product {% endblock %}
+
+{% block content %}
+<div class="product-create-container">
+  <form
+    action="{% if product %}/shops/{{ shop.slug }}/products/{{ product.id }}/update{% else %}/shops/{{ shop.slug }}/products/create{% endif %}"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <fieldset>
+      <legend>Product</legend>
+      <div>
+        <label for="name">Name:</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          maxlength="128"
+          required
+          autocomplete="off"
+          value="{% if product %}{{ product.name }}{% endif %}"
+        />
+      </div>
+      <div>
+        <select name="category" id="category" multiple="multiple">
+          {% if product %} {% for category in categories %}
+          <option
+            value="{{ category.id }}"
+            {%
+            if
+            category.id
+            in
+            product_categories
+            %}selected{%
+            endif
+            %}
+          >
+            {{ category.name }}
+          </option>
+          {% endfor %} {% else %} {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %} {% endif %}
+        </select>
+      </div>
+      <div>
+        <label for="price">Price:</label>
+        <input
+          id="price"
+          name="price"
+          type="number"
+          step="any"
+          required
+          value="{%if product %}{{ product.price}}{% endif %}"
+        />
+        <span>$</span>
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" cols="30" rows="10">
+{%if product %}{{ product.description }}{% endif %}</textarea
+        >
+      </div>
+      <div>
+        {% if product and product.image %}
+        <p>Current image: <img src="/media/{{ product.image }}" /></p>
+        {% endif %}
+        <label for="image">Image:</label>
+        <input id="image" name="image" type="file" />
+      </div>
+      <div>
+        <button>{% if product %} Update {% else %} Create {% endif %}</button>
+      </div>
+    </fieldset>
+  </form>
+</div>
+{% endblock %}

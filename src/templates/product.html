@@ -1,36 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>• {{ product.name }} •</title>
-    <link rel="stylesheet" href="/main.css" />
-  <body>
-    <div>
-      {% if product.image %}
-      <img src="/media/{{ product.image }}" width="25%" height="25%" />
-      {% endif %}
-      <p>Name: {{ product.name }}.</p>
-      <p>Price: {{ product.price }}$.</p>
-      {% if product.description %}
-      <p>Description: {{ product.description }}.</p>
-      {% else %}
-      <p>Description: none.</p>
-      {% endif %}
-      <p>Shop: {{ product.shop.name }}</p>
-      <h3>Categories:</h3>
-      {% with categories = product.get_categories() %}
-        {% if categories %}
-          <ul>
-            {% for category in product.get_categories() %}
-              <li>{{ category.name }}</li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>None</p>
-        {% endif %}
-    {% endwith %}
-    </div>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+<!-- prettier-ignore -->
+{% block title %} {{ product.name }} {% endblock %}
+
+{% block content %}
+<div>
+  {% if product.image %}
+  <img src="/media/{{ product.image }}" width="25%" height="25%" />
+  {% endif %}
+  <p>Name: {{ product.name }}.</p>
+  <p>Price: {{ product.price }}$.</p>
+  {% if product.description %}
+  <p>Description: {{ product.description }}.</p>
+  {% else %}
+  <p>Description: none.</p>
+  {% endif %}
+  <p>Shop: {{ product.shop.name }}</p>
+  <h3>Categories:</h3>
+  {% with categories = product.get_categories() %} {% if categories %}
+  <ul>
+    {% for category in product.get_categories() %}
+    <li>{{ category.name }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>None</p>
+  {% endif %} {% endwith %}
+</div>
+{% endblock %}

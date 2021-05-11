@@ -11,12 +11,14 @@ from settings import MEDIA_ROOT, STATIC_ROOT
 url_map = Map([
     Rule('/', endpoint='index'),
     Rule('/cart', endpoint='cart'),
-    Rule('/products/<id>', endpoint='product_detail'),
-    Rule('/products/create', endpoint='product_create'),
-    Rule('/shops/<slug>', endpoint='shop_detail'),
     Rule('/shops/create', endpoint='shop_create'),
-    Rule('/shops/reviews/create', endpoint='shop_review_create'),
-    Rule('/shops/<slug>/<category>', endpoint='shop_category')
+    Rule('/shops/<slug>', endpoint='shop_detail'),
+    Rule('/shops/<slug>/<category>', endpoint='shop_category'),
+    Rule('/shops/<slug>/products/create', endpoint='product_create'),
+    Rule('/shops/<slug>/products/<id>', endpoint='product_detail'),
+    Rule('/shops/<slug>/products/<id>/update', endpoint='product_update'),
+    # Rule('/shops/<slug>/products/<id>/delete'),
+    Rule('/shops/<slug>/reviews/create', endpoint='shop_review_create')
 ])
 
 

@@ -197,7 +197,19 @@ class Product:
             ) VALUES (%s, %s)
         """, (self.id, category_id))
 
-    # amazon , fruits
+    def update(self, name, price, description, image):
+        db.cursor.execute(f"""
+            UPDATE {self.__table__}
+            SET name = %s,
+                price = %s,
+                description = %s,
+                image = %s
+            WHERE {self.__table__}.id = %s
+            RETURNING *
+        """, (name, price, description, image, self.id))
+        row = db.cursor.fetchone()
+        db.conn.commit()
+        return self.__class__(*row[:6])
 
     @classmethod
     def get_by_shop_category(cls, shop_id, category_id):
@@ -245,6 +257,3 @@ class Product:
         db.conn.commit()
         products = [cls(*row[:5], Shop(*row[6:])) for row in rows]
         return products
-
-    def get_absolute_url(self):
-        return f'/products/{self.id}'
