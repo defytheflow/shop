@@ -66,6 +66,16 @@ def product_detail(request, values):
     return render_template('product.html', {'product': product})
 
 
+def product_delete(request, values):
+    product = Product.get(pk=values.get('id'))
+
+    if product is None:
+        return NotFound()
+
+    product.delete()
+    return redirect(product.shop.get_absolute_url())
+
+
 def product_create(request, values):
     shop = Shop.get(slug=values.get('slug'))
 
@@ -99,7 +109,6 @@ def product_create(request, values):
         product.add_category(category)
 
     return redirect(f'/shops/{shop.slug}/products/{product.id}')
-
 
 
 def product_update(request, values):

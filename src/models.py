@@ -236,6 +236,12 @@ class Product:
         db.conn.commit()
         return cls(*row)
 
+    def delete(self):
+        db.cursor.execute(f"""
+            DELETE FROM {self.__table__} WHERE {self.__table__}.id = %s
+        """, (self.id,))
+        db.conn.commit()
+
     @classmethod
     def get(cls, pk):
         db.cursor.execute(f"""

@@ -18,6 +18,11 @@
           >Update</a
         >
       </button>
+      <button>
+        <a href="/shops/{{ shop.slug }}/products/{{ product.id }}/delete"
+          >Delete &times;</a
+        >
+      </button>
       <p>{{ product.description }}</p>
       {% if product.image %}
       <img src="/media/{{ product.image }}" width="25%" height="25%" />
