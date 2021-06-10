@@ -9,10 +9,22 @@
   </head>
   <body>
     <header>
-      <nav>
-        <a href="/">Home</a>
-        &nbsp;
-        <a href="/cart">Cart</a>
+      <nav class="nav">
+        <div>
+          <a class="home-link" href="/">
+            <img src="/free-icon-web-house-15730.svg" alt="home button" />
+            Home &nbsp;
+          </a>
+          <a class="cart-link" href="/cart">
+            <img src="/cart.svg" alt="cart button" />
+            Cart &nbsp;
+          </a>
+        </div>
+
+        <div class="nav-auth">
+          <a class="link-btn signin-link" href="/users/login"> Sign in </a>
+          <a class="link-btn signup-link" href="/users/create"> Sign up </a>
+        </div>
       </nav>
     </header>
     {% block content %} {% endblock %}

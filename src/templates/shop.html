@@ -4,10 +4,24 @@
 {% block title %} {{ shop.name }} {% endblock %}
 
 {% block content %}
-<h1>Welcome to {{ shop.name }}!</h1>
+{% with categories = shop.get_categories() %}
+<div class="search">
+  <select class="search-select" name="category" id="category">
+    <option>All categories</option>
+    {% for category in categories %}
+    <option value="{{ category.id }}">{{ category.name }}</option>
+    {% endfor %}
+  </select>
+  <input class="search-input" name="q" type="search" />
+  <button class="search-btn">
+    <!-- Artyom will get hacked for this... -->
+    <img src="https://img.icons8.com/pastel-glyph/2x/search--v3.png" />
+  </button>
+</div>
 
+<h1>Welcome to {{ shop.name }}!</h1>
 <h3>Categories:</h3>
-{% with categories = shop.get_categories() %} {% if categories %}
+{% if categories %}
 <ul>
   {% for category in shop.get_categories() %}
   <li>
@@ -17,7 +31,7 @@
 </ul>
 {% else %}
 <p>None</p>
-{% endif %} {% endwith %}
+{% endif %}
 
 <div>
   <button>
@@ -61,4 +75,4 @@
     </div>
   </fieldset>
 </form>
-{% endblock %}
+{% endwith %} {% endblock %}

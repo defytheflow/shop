@@ -5,3 +5,88 @@
 button {
   cursor: pointer;
 }
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav a {
+  text-decoration: none;
+  border: 2px solid black;
+}
+
+.nav-auth {
+  display: flex;
+  align-items: end;
+  gap: 2px;
+}
+
+.signup-link {
+  margin-bottom: auto;
+}
+
+.signin-link {
+  margin-bottom: auto;
+}
+
+.nav .link-btn {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background-color: cyan;
+}
+
+.home-link {
+  display: inline-block;
+  border-radius: 5px;
+  height: 64px;
+  background-color: cyan;
+}
+
+.cart-link {
+  display: inline-block;
+  border-radius: 5px;
+  height: 64px;
+  background-color: cyan;
+}
+
+.search {
+  display: flex;
+}
+
+.search-select {
+  padding: 10px;
+  font-size: 1.25rem;
+  color: #555;
+}
+
+.search-select option:not(:first-child) {
+  text-transform: capitalize;
+}
+
+.search-select:hover {
+  color: #000;
+  background-color: rgba(209, 209, 209, 0.583);
+  cursor: pointer;
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 1.25rem;
+  flex-grow: 1;
+}
+
+.search-btn {
+  /* width: 50px;
+  height: 50px; */
+  margin-left: 4px;
+  background-color: cyan;
+  border: none;
+  border-radius: 10px;
+}
+
+.search-btn img {
+  width: 35px;
+  height: 35px;
+}

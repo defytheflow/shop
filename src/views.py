@@ -3,7 +3,7 @@ import os
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import redirect, secure_filename
 
-from models import Category, Product, Shop, ShopReview
+from models import Category, Product, Shop, ShopReview, User
 from settings import MEDIA_ROOT
 from utils import render_template
 
@@ -171,7 +171,20 @@ def product_update(request, values):
     # for category in categories:
     #     product.add_category(category)
 
+def user_create(request, values):
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
 
+    # TODO check name, email, password
+
+    user = User.create(
+        username=username,
+        email=email,
+        password=password
+    )
+
+    return redirect('/users/login')
 
 
 def shop_create(request, values):

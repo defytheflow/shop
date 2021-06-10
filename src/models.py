@@ -1,6 +1,14 @@
 from dataclasses import dataclass
 
+from passlib.context import CryptContext
+
 from db import db
+
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256"],
+    default="pbkdf2_sha256",
+    pbkdf2_sha256__default_rounds=30000,
+)
 
 
 @dataclass
@@ -23,7 +31,8 @@ class Shop:
             INNER JOIN products
             ON products.id = product_category.product_id
 
-            WHERE products.shop_id = %s;
+            WHERE products.shop_id = %s
+            ORDER BY categories.name;
         """, (self.id, ))
         rows = db.cursor.fetchall()
         db.conn.commit()
@@ -164,6 +173,35 @@ class Category:
         db.conn.commit()
 
         return None if row is None else cls(*row)
+
+
+@dataclass
+class User:
+    id: int
+    username: str
+    email: str
+    password: str
+
+    __table__ = 'users'
+
+    @staticmethod
+    def encrypt_password(password):
+        return pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password)
+
+    @classmethod
+    def create(cls, username, email, password):
+        db.cursor.execute(f"""
+            INSERT INTO {cls.__table__} (
+                username, email, password) VALUES (
+                %s, %s, %s
+            ) RETURNING *
+        """, (username, email, User.encrypt_password(password)))
+        row = db.cursor.fetchone()
+        db.conn.commit()
+        return cls(*row)
 
 
 @dataclass
