@@ -64,7 +64,7 @@ class DB:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users(
                  id SERIAL PRIMARY KEY,
-                 username VARCHAR(64) NOT NULL UNIQUE,
+                 username VARCHAR(36) NOT NULL UNIQUE,
                  email VARCHAR(255) NOT NULL UNIQUE,
                  password VARCHAR(128) NOT NULL UNIQUE
             )

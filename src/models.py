@@ -185,10 +185,10 @@ class User:
     __table__ = 'users'
 
     @staticmethod
-    def encrypt_password(password):
+    def encrypt_password(password: str) -> str:
         return pwd_context.encrypt(password)
 
-    def verify_password(self, password):
+    def verify_password(self, password: str) -> bool:
         return pwd_context.verify(password, self.password)
 
     @classmethod
@@ -202,6 +202,17 @@ class User:
         row = db.cursor.fetchone()
         db.conn.commit()
         return cls(*row)
+
+    @classmethod
+    def check_unique(cls, username: str, email: str) -> bool:
+        db.cursor.execute(f"""
+            SELECT EXISTS(SELECT 1 FROM {cls.__table__} WHERE username = %s
+            OR email = %s
+        )
+        """, (username, email))
+        row = db.cursor.fetchone()
+        db.conn.commit()
+        return row[0] is False
 
 
 @dataclass

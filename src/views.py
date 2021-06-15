@@ -1,6 +1,7 @@
 import os
+import re
 
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 from werkzeug.utils import redirect, secure_filename
 
 from models import Category, Product, Shop, ShopReview, User
@@ -8,7 +9,6 @@ from settings import MEDIA_ROOT
 from utils import render_template
 
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif')
-
 
 def allowed_image(image_name):
     for extension in ALLOWED_EXTENSIONS:
@@ -30,7 +30,7 @@ def shop_detail(request, values):
     shop = Shop.get(slug=values.get('slug'))
 
     if shop is None:
-        return NotFound()
+        raise NotFound()
 
     categories = Category.all()
 
@@ -42,12 +42,12 @@ def shop_category(request, values):
     shop = Shop.get(slug=values.get('slug'))
 
     if shop is None:
-        return NotFound()
+        raise NotFound()
 
     category = Category.get(name=values.get('category'))
 
     if category is None:
-        return NotFound()
+        raise NotFound()
 
     products = Product.get_by_shop_category(shop.id, category.id)
 
@@ -61,7 +61,7 @@ def product_detail(request, values):
     product = Product.get(pk=values.get('id'))
 
     if product is None:
-        return NotFound()
+        raise NotFound()
 
     return render_template('product.html', {'product': product})
 
@@ -70,7 +70,7 @@ def product_delete(request, values):
     product = Product.get(pk=values.get('id'))
 
     if product is None:
-        return NotFound()
+        raise NotFound()
 
     product.delete()
     return redirect(product.shop.get_absolute_url())
@@ -80,7 +80,7 @@ def product_create(request, values):
     shop = Shop.get(slug=values.get('slug'))
 
     if shop is None:
-        return NotFound()
+        raise NotFound()
 
     if request.method == 'GET':
         categories = Category.all()
@@ -117,9 +117,6 @@ def product_update(request, values):
     product_categories = [category.id for category in product.get_categories()]
 
     if shop is None or product is None:
-        return NotFound()
-
-    if request.method == 'GET':
         categories = Category.all()
         return render_template('product-form.html', {
             'categories': categories,
@@ -156,27 +153,26 @@ def product_update(request, values):
 
     return redirect(f'/shops/{shop.slug}/products/{product.id}')
 
-    # for category in categories:
-    #     if category not in product_categories:
-    #         product.add_category(category)
-
-
-    # product = Product.create(
-    #     name=name,
-    #     price=price,
-    #     image=image_name,
-    #     shop_id=shop.id,
-    #     description=description)
-
-    # for category in categories:
-    #     product.add_category(category)
 
 def user_create(request, values):
+    if request.method == 'GET':
+        return render_template('registration.html')
+
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
 
-    # TODO check name, email, password
+    if not re.match(r'^\w{3,36}$', username):
+        raise BadRequest('invalid name')
+
+    if not re.match(r'^(?!\.)[\w\.]*\w@\w+(\.\w+)+$', email):
+        raise BadRequest('invalid mail adress')
+
+    if len(password) > 128 or len(password) < 8:
+        raise BadRequest('invalid password')
+
+    if not User.check_unique(username=username, email=email):
+        raise BadRequest('Username or email are not unique')
 
     user = User.create(
         username=username,
@@ -185,6 +181,17 @@ def user_create(request, values):
     )
 
     return redirect('/users/login')
+
+
+# TODO
+def user_login(request, values):
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    if not User.verify_username() or not User.verify_password():
+        raise Unauthorized('Username or password are incorrect')
+
+    return redirect('/users/topsecret')
 
 
 def shop_create(request, values):
@@ -210,7 +217,7 @@ def shop_review_create(request, values):
     shop = Shop.get(slug=values.get('slug'))
 
     if shop is None:
-        return NotFound()
+        raise NotFound()
 
     username = request.form.get('username')
     text = request.form.get('text')
